@@ -1,10 +1,12 @@
-# MC Dynamite Managed Component
-
-## Documentation
-
-Managed Components docs are published at **https://managedcomponents.dev** .
+# Pinterest Managed Component
 
 Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-open-source-managed-components-and-webcm/) for inspiration and motivation details.
+
+<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
+[![All Contributors](https://img.shields.io/badge/all_contributors-3-orange.svg?style=flat-square)](#contributors-)
+
+<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Released under the Apache license.](https://img.shields.io/badge/license-apache-blue.svg)](./LICENSE)
 [![PRs welcome!](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./CONTRIBUTING.md)
@@ -12,7 +14,7 @@ Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-
 
 ## 🚀 Quickstart local dev environment
 
-1. Make sure you're running node version >=18.
+1. Make sure you're running node version >=17.
 2. Install dependencies with `npm i`
 3. Run unit test watcher with `npm run test:dev`
 
@@ -20,18 +22,36 @@ Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-
 
 > Settings are used to configure the tool in a Component Manager config file
 
-### Example Setting `boolean`
+### TID `string` _required_
 
-`exampleSetting` can be the pixelID or any other essential/optional setting like the option to anonymize IPs, send ecommerce events etc.
+`tid` Pixel Tag ID - The Pinterest Tag ID is the unique identifier of your Pinterest tag. [Learn more](https://help.pinterest.com/en/business/article/track-conversions-with-pinterest-tag).
 
-## 🧱 Fields Description
-
-> Fields are properties that can/must be sent with certain events
-
-### Human Readable Field Name `type` _required_
-
-`field_id` give it a short description and send to a more detailed reference [Find more about how to create your own Managed Component](https://managedcomponents.dev/).
+## 🧱 Fields
 
 ## 📝 License
 
 Licensed under the [Apache License](./LICENSE).
+
+## 💜 Thanks
+
+Thanks to everyone contributing in any manner for this repo and to everyone working on Open Source in general.
+
+## Contributors ✨
+
+Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/omarmosid"><img src="https://avatars.githubusercontent.com/u/47219640?v=4?s=75" width="75px;" alt=""/><br /><sub><b>Omar Mohammad</b></sub></a><br /><a href="https://github.com/managed-components/@managed-components/pinterest/commits?author=omarmosid" title="Code">💻</a></td>
+  </tr>
+</table>
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
+
+This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
