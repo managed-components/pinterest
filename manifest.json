@@ -1,8 +1,11 @@
 {
   "name": "Pinterest",
-  "namespace": "pinterest-mc",
+  "namespace": "pinterest",
   "description": "Pinterest Managed Component",
-  "icon": "assets/pinterest.png",
+  "icon": "assets/icon.svg",
+  "categories": ["Analytics"],
+  "provides": ["events"],
+  "allowCustomFields": true,
   "permissions": {
     "client_network_requests": {
       "description": "This permission is used to facilitate better a user experience.",
