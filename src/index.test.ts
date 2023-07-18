@@ -1,13 +1,11 @@
 import { ComponentSettings, MCEvent } from '@managed-components/types'
-import pinterest, {
+import {
   AutomaticDataType,
   getRequestBody,
   getRequestUrl,
   handler,
   RequestBodyType,
 } from '.'
-
-type MockMCEventType = {}
 
 describe('Pinterest MC sends correct request', () => {
   const baseHostname = '127.0.0.1'
