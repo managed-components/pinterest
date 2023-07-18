@@ -61,11 +61,7 @@ export const getRequestBody = (
   return requestBody
 }
 
-export const getRequestUrl = (
-  requestBody: RequestBodyType,
-  event: MCEvent,
-  settings: ComponentSettings
-): string => {
+export const getRequestUrl = (requestBody: RequestBodyType): string => {
   const queryParams = new URLSearchParams(requestBody).toString()
   return `https://ct.pinterest.com/v3/?${queryParams}`
 }
@@ -85,7 +81,7 @@ export const handler = (
   customSendRequest = sendRequest
 ) => {
   const requestBody = getRequestBody(eventType, event, settings)
-  const requestUrl = getRequestUrl(requestBody, event, settings)
+  const requestUrl = getRequestUrl(requestBody)
   customSendRequest(requestUrl, event)
 }
 
