@@ -1,101 +1,83 @@
-import { ComponentSettings, MCEvent } from '@managed-components/types'
-import {
-  AutomaticDataType,
-  getRequestBody,
-  getRequestUrl,
-  handler,
-  RequestBodyType,
-} from '.'
-
-describe('Pinterest MC sends correct request', () => {
-  const baseHostname = '127.0.0.1'
-  const port = '1337'
-  const baseHost = `${baseHostname}:${port}`
-  const baseOrigin = `https://${baseHost}`
-  const baseHref = `${baseOrigin}/`
-  const searchParams = new URLSearchParams()
-
-  const mockEvent = new Event('pagevisit', {}) as MCEvent
-  mockEvent.name = 'Pinterest Test'
-  mockEvent.payload = { timestamp: 1670409810, event: 'pagevisit', tid: 'xyz' }
-  mockEvent.client = {
-    url: {
-      href: baseHref,
-      origin: baseOrigin,
-      protocol: 'http:',
-      username: '',
-      password: '',
-      host: baseHost,
-      hostname: baseHostname,
-      port: port,
-      pathname: '/',
-      search: '',
-      searchParams: searchParams,
-      hash: '',
-    },
-    title: 'Zaraz "Test" /t Page',
-    timestamp: 1670409810,
-    userAgent:
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
-    language: 'en-GB',
-    referer: `${baseOrigin}/somewhere-else.html`,
-    ip: baseHostname,
-    emitter: 'browser',
-  }
-
-  const settings: ComponentSettings = {}
-
-  const time = new Date().valueOf().toString()
-  const ad: AutomaticDataType = {
-    loc: baseHref,
-    ref: `${baseOrigin}/somewhere-else.html`,
-    if: false,
-    mh: '2424edb5',
-  }
-
-  it('returns correctly constructed requestBodyObject', () => {
-    const expectedRequestBody: RequestBodyType = {
-      ad: JSON.stringify(ad),
-      cb: time,
-      tid: 'xyz',
-      event: 'pagevisit',
-      'pd[tm]': 'pinterest-mc',
-      ed: JSON.stringify({
-        timestamp: 1670409810,
-        event: 'pagevisit',
-      }),
+import { MCEvent } from '@managed-components/types'
+import { getEventData } from '.'
+describe('getEventData', () => {
+  it('generates a compliant request payload', () => {
+    const expectedResult = {
+      event_name: 'lead',
+      action_source: 'brie',
+      event_time: 1692890759111,
+      event_id: 'mytest133r4524',
+      event_source_url: 'http://localhost:1337/',
+      opt_out: true,
+      partner_name: 'Me',
+      app_id: 'wow1234',
+      app_name: 'terrificapp!',
+      app_version: 'my version 1234',
+      device_brand: 'Apple',
+      device_model: 'Macintosh',
+      os_version: '10.15.7',
+      wifi: true,
+      language: 'en',
+      user_properties: {
+        client_ip_address: '::1',
+        client_user_agent:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
+        em: 'f660ab912ec121d1b1e928a0bb4bc61b15f5ad44d5efdc4e1c92a25e99b8e44a',
+        hashed_maids:
+          '5e8a5ed735739e9281b7324b75bc96b37784f75cad8ab1ccffb61f87a098c06a',
+        ph: 'a231e771cb4993085107fb4a6c067b850466eeccaa3c58d446ae48a5ee83b7a9',
+        ge: '5856e02f6fd0853c17f99778b1663b833e0aaac36f4ab09de76e5518db518a1e',
+      },
+      custom_data: {
+        search_string: 'string',
+        opt_out_type: 'marketing',
+        np: 'somethings',
+      },
     }
+    const mockMCEvent = {
+      payload: {
+        name: 'lead',
+        action_source: 'brie',
+        event_id: 'mytest133r4524',
+        opt_out: true,
+        partner_name: 'Me',
+        app_id: 'wow1234',
+        app_name: 'terrificapp!',
+        app_version: 'my version 1234',
+        wifi: true,
+        em: 'test@test.com',
+        hashed_maids: 'ga.1.2.3.4.5.6.7.',
+        ph: '05498715647',
+        ge: 'male',
+        bd: '23/3/12',
+        ln: 'Hanni',
+        fn: 'Chris',
+        ct: 'Capetown',
+        st: 'onestreet',
+        zp: '1002',
+        country: 'South Africa',
+        external_id: '12413512515',
+        click_id: '1531262624',
+        search_string: 'string',
+        opt_out_type: 'marketing',
+        np: 'somethings',
+      },
+      client: {
+        emitter: 'browser',
+        userAgent:
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/116.0.0.0 Safari/537.36',
+        language: 'en-GB,en-US;q=0.9,en;q=0.8',
+        referer: '',
+        ip: '::1',
+        title: 'Yair Dovrat',
+        timestamp: 1692890759111,
+        url: 'http://localhost:1337/',
+      },
+      type: 'event',
+    } as unknown as MCEvent
 
-    const requestBody = getRequestBody('pagevisit', mockEvent, settings)
+    const result = getEventData(mockMCEvent, false)
 
-    expect(requestBody.ad).toEqual(expectedRequestBody.ad)
-    expect(requestBody.event).toEqual(expectedRequestBody.event)
-    expect(requestBody.tid).toEqual(expectedRequestBody.tid)
-    expect(requestBody['pd[tm]']).toEqual('pinterest-mc')
+    expect(result).toEqual(expectedResult)
   })
-
-  it('returns correct url to send to', () => {
-    const rawRequestBody = {
-      ad: '{"loc":"https://127.0.0.1:1337/","ref":"https://127.0.0.1:1337/somewhere-else.html","if":false,"mh":"2424edb5"}',
-      cb: '1671006315874',
-      tid: 'xyz',
-      event: 'pagevisit',
-      'pd[tm]': 'pinterest-mc',
-      ed: '{"timestamp":1670409810,"event":"pagevisit"}',
-    }
-    const requestUrl = getRequestUrl(rawRequestBody, mockEvent, settings)
-    const requestUrlDecoded = decodeURI(requestUrl)
-
-    const expectedUrl = `https://ct.pinterest.com/v3/?ad={"loc"%3A"https%3A%2F%2F127.0.0.1%3A1337%2F"%2C"ref"%3A"https%3A%2F%2F127.0.0.1%3A1337%2Fsomewhere-else.html"%2C"if"%3Afalse%2C"mh"%3A"2424edb5"}&cb=1671006315874&tid=xyz&event=pagevisit&pd[tm]=pinterest-mc&ed={"timestamp"%3A1670409810%2C"event"%3A"pagevisit"}`
-
-    expect(requestUrlDecoded).toEqual(expectedUrl)
-  })
-
-  it('Handler invokes fetch correctly', () => {
-    const arr = []
-    handler('pageview', mockEvent, settings, (...args) => {
-      arr.push(args)
-    })
-    expect(arr.length).toBe(1)
-  })
-})
+})~
