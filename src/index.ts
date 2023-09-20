@@ -106,7 +106,23 @@ export default async function (manager: Manager, settings: ComponentSettings) {
     handler('signup', event, settings)
   })
 
-  manager.addEventListener('watchVideo', event => {
+  manager.addEventListener('viewcategory', event => {
+    handler('viewcategory', event, settings)
+  })
+  manager.addEventListener('watchvideo', event => {
     handler('watchVideo', event, settings)
+  })
+
+  manager.addEventListener('custom', event => {
+    handler('custom', event, settings)
+  })
+
+  manager.addEventListener('search', event => {
+    handler('search', event, settings)
+  })
+
+  manager.addEventListener('userdefinedevent', event => {
+    const userDefinedEvent: string = event.payload.userDefinedEvent
+    handler(userDefinedEvent, event, settings)
   })
 }
