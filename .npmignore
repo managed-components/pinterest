@@ -1,1 +1,10 @@
 src
+.all-contributorsrc
+.eslintrc.js
+.github/workflows/test.yml
+.prettierrc
+.vscode/settings.json
+assets/pinterest.png
+dist/index.js
+manifest.json
+package.json
