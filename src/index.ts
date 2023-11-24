@@ -62,8 +62,8 @@ const mapEcommerceData = (ecommerce: EcommerceType) => {
   if (!ecommerce.products) {
     return
   } else {
-    ecommerce.products.forEach((product, index) => {
-      ;[
+    ecommerce.products.forEach((product, index) => 
+      [
         'product_id',
         'sku',
         'category',
@@ -76,7 +76,7 @@ const mapEcommerceData = (ecommerce: EcommerceType) => {
         transformedProductData[key] =
           product[prop as keyof Product] || product.sku
       })
-    })
+    )
   }
 
   const ecommerceData = {
