@@ -20,6 +20,76 @@ export type RequestBodyType = {
   ed?: string
 }
 
+// Should we make EcommerceType part of ComponentSettings? It will be used on every MC with ecommerce support
+type EcommerceType = {
+  order_id: number | string
+  currency: string
+  revenue: number | string
+  total: number | string
+  value: number | string
+  quantity: number | string
+  products: Product[] | null
+  checkout_id: number | string
+  affiliation: string
+  shipping: number | string
+  tax: number | string
+  discount: number | string
+  coupon: string
+  creative: string
+  query: string
+  step: number | string
+  payment_type: string
+}
+
+// Should we make Product part of ComponentSettings? It will be used on every MC with ecommerce support
+export type Product = {
+  product_id: number | string
+  sku: number | string
+  name: string
+  category: string
+  brand: string
+  price: number | string
+  quantity: number
+  variant: string
+  currency: string
+  value: number | string
+  position: number | string
+  coupon: number | string
+}
+
+const mapEcommerceData = (ecommerce: EcommerceType) => {
+  const transformedProductData: Record<string, string | number> = {}
+  if (!ecommerce.products) {
+    return
+  } else {
+    ecommerce.products.forEach((product, index) => {
+      ;[
+        'product_id',
+        'sku',
+        'category',
+        'name',
+        'brand',
+        'variant',
+        'price',
+      ].forEach(prop => {
+        const key = `product_${prop}[${index}]`
+        transformedProductData[key] =
+          product[prop as keyof Product] || product.sku
+      })
+    })
+  }
+
+  const ecommerceData = {
+    order_id: ecommerce.order_id,
+    currency: ecommerce.currency,
+    value: ecommerce.revenue || ecommerce.total || ecommerce.value,
+    order_quantity: ecommerce.quantity,
+    ...transformedProductData,
+  }
+
+  return ecommerceData
+}
+
 export const getRequestBody = (
   eventType: string,
   event: MCEvent,
@@ -44,7 +114,7 @@ export const getRequestBody = (
     event: eventType,
   }
 
-  const { 'pd[em]': pdem, tid, ...cleanPayload } = payload
+  const { 'pd[em]': pdem, tid, ecommerce, ...cleanPayload } = payload
 
   // pd - partner data
   if (pdem) {
@@ -53,11 +123,29 @@ export const getRequestBody = (
 
   requestBody['pd[tm]'] = payload.tm || 'pinterest-mc'
 
-  if (Object.keys(cleanPayload).length) {
-    // event data
-    requestBody['ed'] = JSON.stringify(cleanPayload)
+  // match  event types to Pinterest's default
+
+  if (ecommerce) {
+    switch (eventType) {
+      case 'Product Added':
+        requestBody.event = 'addtocart'
+        break
+      case 'Order Completed':
+        requestBody.event = 'checkout'
+        break
+    }
+    // include all ecommerce parameters
+
+    const ecommerceData: any = mapEcommerceData(ecommerce) // not sure how to get read of this any!
+    for (const key in ecommerceData) {
+      cleanPayload[key] = ecommerceData[key]
+    }
   }
 
+  if (Object.keys(cleanPayload).length) {
+    // event data is created, note that it also holds the ecommerce parameters
+    requestBody['ed'] = JSON.stringify(cleanPayload)
+  }
   return requestBody
 }
 
@@ -86,43 +174,13 @@ export const handler = (
 }
 
 export default async function (manager: Manager, settings: ComponentSettings) {
-  manager.addEventListener('pageview', event => {
-    handler('pagevisit', event, settings)
+  manager.addEventListener('event', event => {
+    const eventType = event.payload.ev
+    handler(eventType, event, settings)
   })
 
-  manager.addEventListener('addtocart', event => {
-    handler('addtocart', event, settings)
-  })
-
-  manager.addEventListener('checkout', event => {
-    handler('checkout', event, settings)
-  })
-
-  manager.addEventListener('lead', event => {
-    handler('lead', event, settings)
-  })
-
-  manager.addEventListener('signup', event => {
-    handler('signup', event, settings)
-  })
-
-  manager.addEventListener('viewcategory', event => {
-    handler('viewcategory', event, settings)
-  })
-  manager.addEventListener('watchvideo', event => {
-    handler('watchVideo', event, settings)
-  })
-
-  manager.addEventListener('custom', event => {
-    handler('custom', event, settings)
-  })
-
-  manager.addEventListener('search', event => {
-    handler('search', event, settings)
-  })
-
-  manager.addEventListener('userdefinedevent', event => {
-    const userDefinedEvent: string = event.payload.userDefinedEvent
-    handler(userDefinedEvent, event, settings)
+  manager.addEventListener('ecommerce', event => {
+    const eventType = event.payload.ev
+    handler(eventType, event, settings)
   })
 }
