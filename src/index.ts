@@ -62,7 +62,7 @@ const mapEcommerceData = (ecommerce: EcommerceType) => {
   if (!ecommerce.products) {
     return
   } else {
-    ecommerce.products.forEach((product, index) => 
+    ecommerce.products.forEach((product, index) =>
       [
         'product_id',
         'sku',
@@ -124,22 +124,18 @@ export const getRequestBody = (
   requestBody['pd[tm]'] = payload.tm || 'pinterest-mc'
 
   // match  event types to Pinterest's default
+  const eventTypes: Record<string, string> = {
+    'Product Added': 'addtocart',
+    'Order Completed': 'checkout',
+  }
 
-  if (ecommerce) {
-    switch (eventType) {
-      case 'Product Added':
-        requestBody.event = 'addtocart'
-        break
-      case 'Order Completed':
-        requestBody.event = 'checkout'
-        break
-    }
-    // include all ecommerce parameters
+  if (eventTypes[eventType]) {
+    requestBody.event = eventTypes[eventType]
+  }
 
-    const ecommerceData: any = mapEcommerceData(ecommerce) // not sure how to get read of this any!
-    for (const key in ecommerceData) {
-      cleanPayload[key] = ecommerceData[key]
-    }
+  const ecommerceData: any = mapEcommerceData(ecommerce) // not sure how to get read of this any!
+  for (const key in ecommerceData) {
+    cleanPayload[key] = ecommerceData[key]
   }
 
   if (Object.keys(cleanPayload).length) {
