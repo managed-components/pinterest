@@ -145,7 +145,6 @@ export const getRequestBody = (
     // event data is created, note that it also holds the ecommerce parameters
     requestBody['ed'] = JSON.stringify(cleanPayload)
   }
-  console.log('`@#@#@#@###@#@ requestbody:', requestBody)
   return requestBody
 }
 
