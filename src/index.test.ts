@@ -13,34 +13,21 @@ describe('Pinterest MC sends correct request', () => {
   const baseHost = `${baseHostname}:${port}`
   const baseOrigin = `https://${baseHost}`
   const baseHref = `${baseOrigin}/`
-  const searchParams = new URLSearchParams()
+  // const searchParams = new URLSearchParams()
 
-  const mockEvent = new Event('pagevisit', {}) as MCEvent
-  mockEvent.name = 'Pinterest Test'
-  mockEvent.payload = { timestamp: 1670409810, event: 'pagevisit', tid: 'xyz' }
-  mockEvent.client = {
-    url: {
-      href: baseHref,
-      origin: baseOrigin,
-      protocol: 'http:',
-      username: '',
-      password: '',
-      host: baseHost,
-      hostname: baseHostname,
-      port: port,
-      pathname: '/',
-      search: '',
-      searchParams: searchParams,
-      hash: '',
+  const mockEvent: MCEvent = {
+    payload: { timestamp: 1670409810, event: 'pagevisit', tid: 'xyz' },
+    client: {
+      url: new URL(baseHref),
+      title: 'Zaraz "Test" /t Page',
+      timestamp: 1670409810,
+      userAgent:
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
+      language: 'en-GB',
+      referer: `${baseOrigin}/somewhere-else.html`,
+      ip: baseHostname,
+      emitter: 'browser',
     },
-    title: 'Zaraz "Test" /t Page',
-    timestamp: 1670409810,
-    userAgent:
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36',
-    language: 'en-GB',
-    referer: `${baseOrigin}/somewhere-else.html`,
-    ip: baseHostname,
-    emitter: 'browser',
   }
 
   const settings: ComponentSettings = {}

@@ -57,10 +57,12 @@ export type Product = {
   coupon: number | string
 }
 
-const mapEcommerceData = (ecommerce: EcommerceType) => {
+function mapEcommerceData(
+  ecommerce: EcommerceType
+): Record<string, string | number> | null {
   const transformedProductData: Record<string, string | number> = {}
-  if (!ecommerce.products) {
-    return
+  if (!ecommerce || !ecommerce.products) {
+    return null
   } else {
     ecommerce.products.forEach((product, index) =>
       [
@@ -133,7 +135,8 @@ export const getRequestBody = (
     requestBody.event = eventTypes[eventType]
   }
 
-  const ecommerceData: any = mapEcommerceData(ecommerce) // not sure how to get read of this any!
+  const ecommerceData: Record<string, string | number> | null =
+    mapEcommerceData(ecommerce)
   for (const key in ecommerceData) {
     cleanPayload[key] = ecommerceData[key]
   }
@@ -142,6 +145,7 @@ export const getRequestBody = (
     // event data is created, note that it also holds the ecommerce parameters
     requestBody['ed'] = JSON.stringify(cleanPayload)
   }
+  console.log('`@#@#@#@###@#@ requestbody:', requestBody)
   return requestBody
 }
 
