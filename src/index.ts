@@ -129,6 +129,7 @@ export const getRequestBody = (
   const eventTypes: Record<string, string> = {
     'Product Added': 'addtocart',
     'Order Completed': 'checkout',
+    'Products Searched': 'search',
   }
 
   if (eventTypes[eventType]) {
@@ -183,7 +184,7 @@ export default async function (manager: Manager, settings: ComponentSettings) {
   })
 
   manager.addEventListener('ecommerce', event => {
-    const eventType = event.payload.ev
+    const eventType = event.payload.ude || event.payload.ev
     handler(eventType, event, settings)
   })
 }
