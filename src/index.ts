@@ -173,6 +173,10 @@ export const handler = (
 }
 
 export default async function (manager: Manager, settings: ComponentSettings) {
+  manager.addEventListener('pageview', event => {
+    handler('pagevisit', event, settings)
+  })
+
   manager.addEventListener('event', event => {
     const eventType = event.payload.ev
     handler(eventType, event, settings)
