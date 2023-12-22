@@ -2,7 +2,7 @@
   "name": "Pinterest",
   "namespace": "pinterest",
   "description": "Pinterest Managed Component",
-  "icon": "assets/pinterest.svg",
+  "icon": "assets/Pinterest.svg",
   "categories": ["Analytics"],
   "provides": ["events"],
   "allowCustomFields": true,

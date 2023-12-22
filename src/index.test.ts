@@ -13,7 +13,6 @@ describe('Pinterest MC sends correct request', () => {
   const baseHost = `${baseHostname}:${port}`
   const baseOrigin = `https://${baseHost}`
   const baseHref = `${baseOrigin}/`
-  // const searchParams = new URLSearchParams()
 
   const mockEvent: MCEvent = {
     payload: { timestamp: 1670409810, event: 'pagevisit', tid: 'xyz' },

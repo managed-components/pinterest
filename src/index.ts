@@ -56,6 +56,11 @@ export type Product = {
   position: number | string
   coupon: number | string
 }
+const eventTypes: Record<string, string> = {
+  'Product Added': 'addtocart',
+  'Order Completed': 'checkout',
+  'Products Searched': 'search',
+}
 
 function mapEcommerceData(
   ecommerce: EcommerceType
@@ -92,6 +97,7 @@ function mapEcommerceData(
   return ecommerceData
 }
 
+
 export const getRequestBody = (
   eventType: string,
   event: MCEvent,
@@ -126,17 +132,12 @@ export const getRequestBody = (
   requestBody['pd[tm]'] = payload.tm || 'pinterest-mc'
 
   // match  event types to Pinterest's default
-  const eventTypes: Record<string, string> = {
-    'Product Added': 'addtocart',
-    'Order Completed': 'checkout',
-    'Products Searched': 'search',
-  }
 
   if (eventTypes[eventType]) {
     requestBody.event = eventTypes[eventType]
   }
 
-  const ecommerceData: Record<string, string | number> | null =
+  const ecommerceData =
     mapEcommerceData(ecommerce)
   for (const key in ecommerceData) {
     cleanPayload[key] = ecommerceData[key]
