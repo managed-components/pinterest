@@ -20,7 +20,6 @@ export type RequestBodyType = {
   ed?: string
 }
 
-// Should we make EcommerceType part of ComponentSettings? It will be used on every MC with ecommerce support
 type EcommerceType = {
   order_id: number | string
   currency: string
@@ -41,7 +40,6 @@ type EcommerceType = {
   payment_type: string
 }
 
-// Should we make Product part of ComponentSettings? It will be used on every MC with ecommerce support
 export type Product = {
   product_id: number | string
   sku: number | string
@@ -56,7 +54,13 @@ export type Product = {
   position: number | string
   coupon: number | string
 }
-const eventTypes: Record<string, string> = {
+const eventMappings: { [key: string]: string } = {
+  pageview: 'pagevisit',
+  lead: 'lead',
+  signup: 'signup',
+  watchvideo: 'watchvideo',
+  viewcategory: 'viewcategory',
+  custom: 'custom',
   'Product Added': 'addtocart',
   'Order Completed': 'checkout',
   'Products Searched': 'search',
@@ -93,10 +97,8 @@ function mapEcommerceData(
     order_quantity: ecommerce.quantity,
     ...transformedProductData,
   }
-
   return ecommerceData
 }
-
 
 export const getRequestBody = (
   eventType: string,
@@ -119,10 +121,10 @@ export const getRequestBody = (
     ad: JSON.stringify(automaticData),
     cb: new Date().valueOf().toString(),
     tid: payload.tid || settings.tid,
-    event: eventType,
+    event: eventMappings[eventType] || eventType,
   }
 
-  const { 'pd[em]': pdem, tid, ecommerce, ...cleanPayload } = payload
+  const { pdem, tid, ecommerce, ...cleanPayload } = payload
 
   // pd - partner data
   if (pdem) {
@@ -133,12 +135,7 @@ export const getRequestBody = (
 
   // match  event types to Pinterest's default
 
-  if (eventTypes[eventType]) {
-    requestBody.event = eventTypes[eventType]
-  }
-
-  const ecommerceData =
-    mapEcommerceData(ecommerce)
+  const ecommerceData = mapEcommerceData(ecommerce)
   for (const key in ecommerceData) {
     cleanPayload[key] = ecommerceData[key]
   }
@@ -164,11 +161,17 @@ export const sendRequest = (url: string, event: MCEvent) => {
 }
 
 export const handler = (
-  eventType: string,
   event: MCEvent,
   settings: ComponentSettings,
+  isPageview = false,
   customSendRequest = sendRequest
 ) => {
+  const eventType = isPageview
+    ? 'pageview'
+    : event.payload.ude || event.payload.name // ude is the "user defined event" field
+  if (!eventType) {
+    return
+  }
   const requestBody = getRequestBody(eventType, event, settings)
   const requestUrl = getRequestUrl(requestBody)
   customSendRequest(requestUrl, event)
@@ -176,16 +179,13 @@ export const handler = (
 
 export default async function (manager: Manager, settings: ComponentSettings) {
   manager.addEventListener('pageview', event => {
-    handler('pagevisit', event, settings)
+    handler(event, settings, true)
   })
-
   manager.addEventListener('event', event => {
-    const eventType = event.payload.ev
-    handler(eventType, event, settings)
+    handler(event, settings)
   })
 
   manager.addEventListener('ecommerce', event => {
-    const eventType = event.payload.ude || event.payload.ev
-    handler(eventType, event, settings)
+    handler(event, settings)
   })
 }
