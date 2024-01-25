@@ -20,7 +20,6 @@ Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-
 ### TID `string` _required_
 
 `tid` Pixel Tag ID - The Pinterest Tag ID is the unique identifier of your Pinterest tag. [Learn more](https://help.pinterest.com/en/business/article/track-conversions-with-pinterest-tag).
-Sure, I'll remove the "Pixel Tag ID" field and update the "Fields Description" section accordingly.
 
 ---
 
