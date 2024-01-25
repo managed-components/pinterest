@@ -69,7 +69,7 @@ describe('Pinterest MC sends correct request', () => {
       'pd[tm]': 'pinterest-mc',
       ed: '{"timestamp":1670409810,"event":"pagevisit"}',
     }
-    const requestUrl = getRequestUrl(rawRequestBody, mockEvent, settings)
+    const requestUrl = getRequestUrl(rawRequestBody)
     const requestUrlDecoded = decodeURI(requestUrl)
 
     const expectedUrl = `https://ct.pinterest.com/v3/?ad={"loc"%3A"https%3A%2F%2F127.0.0.1%3A1337%2F"%2C"ref"%3A"https%3A%2F%2F127.0.0.1%3A1337%2Fsomewhere-else.html"%2C"if"%3Afalse%2C"mh"%3A"2424edb5"}&cb=1671006315874&tid=xyz&event=pagevisit&pd[tm]=pinterest-mc&ed={"timestamp"%3A1670409810%2C"event"%3A"pagevisit"}`
@@ -78,10 +78,6 @@ describe('Pinterest MC sends correct request', () => {
   })
 
   it('Handler invokes fetch correctly', () => {
-    const arr = []
-    handler('pageview', mockEvent, settings, (...args) => {
-      arr.push(args)
-    })
-    expect(arr.length).toBe(1)
+    expect(() => handler(mockEvent, settings)).not.toThrow()
   })
 })

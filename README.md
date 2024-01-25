@@ -20,6 +20,47 @@ Find out more about Managed Components [here](https://blog.cloudflare.com/zaraz-
 ### TID `string` _required_
 
 `tid` Pixel Tag ID - The Pinterest Tag ID is the unique identifier of your Pinterest tag. [Learn more](https://help.pinterest.com/en/business/article/track-conversions-with-pinterest-tag).
+Sure, I'll remove the "Pixel Tag ID" field and update the "Fields Description" section accordingly.
+
+---
+
+## Fields Description
+
+Fields are properties that can/must be sent with certain events.
+
+### Required Fields
+
+#### Event Name `string` _required_
+
+`event` - The name of the tracking event to be sent to Pinterest.
+
+### Optional Fields
+
+#### User Defined Event `string` _optional_
+
+`ude` - Specify a custom event name for audience targeting purposes. Spaces in the event name will be removed. [Learn more](https://help.pinterest.com/en/business/article/add-event-codes).
+
+#### Partner Data Email `string` _optional_
+
+`pdem` - Specifies the email address associated with the partner data, if applicable.
+
+#### Tag Manager `string` _optional_
+
+`tm` - Indicates the Tag Manager used, defaults to 'pinterest-mc' if not specified.
+
+#### Lead Type `string` _optional_
+
+`lead_type` - Describes the type of lead being tracked, such as 'Newsletter', 'Signup', etc.
+
+#### Video Title `string` _optional_
+
+`video_title` - The title of the video for tracking specific video events.
+
+#### E-commerce Tracking `boolean` _optional_
+
+`ecommerce` - Enables or disables the forwarding of Zaraz E-commerce API events to Pinterest. This includes events like Search, AddToCart, and Checkout. [Learn more](https://help.pinterest.com/en-gb/business/article/add-event-codes).
+
+---
 
 ## 📝 License
 
