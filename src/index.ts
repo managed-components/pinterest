@@ -54,16 +54,18 @@ export type Product = {
   position: number | string
   coupon: number | string
 }
-const eventMappings: { [key: string]: string } = {
-  pageview: 'pagevisit',
-  lead: 'lead',
-  signup: 'signup',
-  watchvideo: 'watchvideo',
-  viewcategory: 'viewcategory',
-  custom: 'custom',
-  'Product Added': 'addtocart',
-  'Order Completed': 'checkout',
-  'Products Searched': 'search',
+
+function mapEcommerceEvent(eventName: string | undefined): string | undefined {
+  switch (eventName) {
+    case 'Product Added':
+      return 'addtocart'
+    case 'Order Completed':
+      return 'checkout'
+    case 'Products Searched':
+      return 'search'
+    default:
+      return undefined // Return undefined to indicate no match
+  }
 }
 
 function mapEcommerceData(
@@ -121,7 +123,7 @@ export const getRequestBody = (
     ad: JSON.stringify(automaticData),
     cb: new Date().valueOf().toString(),
     tid: payload.tid || settings.tid,
-    event: eventMappings[eventType] || eventType,
+    event: eventType,
   }
 
   const { pdem, tid, ecommerce, ...cleanPayload } = payload
@@ -163,29 +165,38 @@ export const sendRequest = (url: string, event: MCEvent) => {
 export const handler = (
   event: MCEvent,
   settings: ComponentSettings,
-  isPageview = false,
+  ev: string,
   customSendRequest = sendRequest
 ) => {
-  const eventType = isPageview
-    ? 'pageview'
-    : event.payload.ude || event.payload.name // ude is the "user defined event" field
-  if (!eventType) {
-    return
-  }
+  const eventType = event.payload.ude || ev // ude is the "user defined event" field in case of eventType ='user-defined-event'
   const requestBody = getRequestBody(eventType, event, settings)
   const requestUrl = getRequestUrl(requestBody)
   customSendRequest(requestUrl, event)
 }
 
 export default async function (manager: Manager, settings: ComponentSettings) {
-  manager.addEventListener('pageview', event => {
-    handler(event, settings, true)
-  })
-  manager.addEventListener('event', event => {
-    handler(event, settings)
+  const events = [
+    'pageview',
+    'lead',
+    'signup',
+    'watchvideo',
+    'viewcategory',
+    'custom',
+    'addtocart',
+    'checkout',
+    'search',
+    'user-defined-event',
+  ]
+  events.forEach(ev => {
+    manager.addEventListener(ev, event => {
+      handler(event, settings, ev)
+    })
   })
 
   manager.addEventListener('ecommerce', event => {
-    handler(event, settings)
+    const ev = mapEcommerceEvent(event.name)
+    if (ev) {
+      handler(event, settings, ev)
+    }
   })
 }
