@@ -15,7 +15,7 @@ describe('Pinterest MC sends correct request', () => {
   const baseHref = `${baseOrigin}/`
 
   const mockEvent: MCEvent = {
-    payload: { timestamp: 1670409810, event: 'pagevisit', tid: 'xyz' },
+    payload: { timestamp: 1670409810, event: 'pageview', tid: 'xyz' },
     client: {
       url: new URL(baseHref),
       title: 'Zaraz "Test" /t Page',
@@ -78,6 +78,6 @@ describe('Pinterest MC sends correct request', () => {
   })
 
   it('Handler invokes fetch correctly', () => {
-    expect(() => handler(mockEvent, settings)).not.toThrow()
+    expect(() => handler(mockEvent, settings, mockEvent.payload.event)).not.toThrow()
   })
 })
