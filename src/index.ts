@@ -54,20 +54,14 @@ export type Product = {
   position: number | string
   coupon: number | string
 }
-
-function mapEcommerceEvent(eventName: string | undefined): string | undefined {
-  switch (eventName) {
-    case 'Product Added':
-      return 'addtocart'
-    case 'Order Completed':
-      return 'checkout'
-    case 'Products Searched':
-      return 'search'
-    default:
-      return undefined // Return undefined to indicate no match
-  }
+const eventMappings: { [key: string]: string } = {
+  'Product Added': 'addtocart',
+  'Order Completed': 'checkout',
+  'Products Searched': 'search',
 }
-
+function mapEcommerceEvent(eventName: string): string | undefined {
+  return eventMappings[eventName] || undefined
+}
 function mapEcommerceData(
   ecommerce: EcommerceType
 ): Record<string, string | number> | null {
