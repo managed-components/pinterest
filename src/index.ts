@@ -188,9 +188,11 @@ export default async function (manager: Manager, settings: ComponentSettings) {
   })
 
   manager.addEventListener('ecommerce', event => {
-    const ev = mapEcommerceEvent(event.name)
-    if (ev) {
-      handler(event, settings, ev)
+    if (typeof event.name === 'string') {
+      const ev = mapEcommerceEvent(event.name)
+      if (ev) {
+        handler(event, settings, ev)
+      }
     }
   })
 }
