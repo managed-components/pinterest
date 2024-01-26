@@ -78,6 +78,10 @@ describe('Pinterest MC sends correct request', () => {
   })
 
   it('Handler invokes fetch correctly', () => {
-    expect(() => handler(mockEvent, settings, mockEvent.payload.event)).not.toThrow()
+    const arr = []
+    handler(mockEvent, settings,'pageview', (...args) => {
+      arr.push(args)
+    })
+    expect(arr.length).toBe(1)
   })
 })
