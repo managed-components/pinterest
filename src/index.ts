@@ -66,10 +66,10 @@ function mapEcommerceData(
   ecommerce: EcommerceType
 ): Record<string, string | number> | null {
   const transformedProductData: Record<string, string | number> = {}
-  if (!ecommerce || !ecommerce.products) {
+  if (!ecommerce) {
     return null
   } else {
-    ecommerce.products.forEach((product, index) =>
+    ecommerce.products?.forEach((product, index) =>
       [
         'product_id',
         'sku',
@@ -121,7 +121,6 @@ export const getRequestBody = (
   }
 
   const { pdem, tid, ecommerce, ...cleanPayload } = payload
-
   // pd - partner data
   if (pdem) {
     requestBody['pd[em]'] = pdem
@@ -186,7 +185,6 @@ export default async function (manager: Manager, settings: ComponentSettings) {
       handler(event, settings, ev)
     })
   })
-
   manager.addEventListener('ecommerce', event => {
     if (typeof event.name === 'string') {
       const ev = mapEcommerceEvent(event.name)
