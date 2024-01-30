@@ -20,6 +20,82 @@ export type RequestBodyType = {
   ed?: string
 }
 
+type EcommerceType = {
+  order_id: number | string
+  currency: string
+  revenue: number | string
+  total: number | string
+  value: number | string
+  quantity: number | string
+  products: Product[] | null
+  checkout_id: number | string
+  affiliation: string
+  shipping: number | string
+  tax: number | string
+  discount: number | string
+  coupon: string
+  creative: string
+  query: string
+  step: number | string
+  payment_type: string
+}
+
+export type Product = {
+  product_id: number | string
+  sku: number | string
+  name: string
+  category: string
+  brand: string
+  price: number | string
+  quantity: number
+  variant: string
+  currency: string
+  value: number | string
+  position: number | string
+  coupon: number | string
+}
+const eventMappings: { [key: string]: string } = {
+  'Product Added': 'addtocart',
+  'Order Completed': 'checkout',
+  'Products Searched': 'search',
+}
+function mapEcommerceEvent(eventName: string): string | undefined {
+  return eventMappings[eventName] || undefined
+}
+function mapEcommerceData(
+  ecommerce: EcommerceType
+): Record<string, string | number> | null {
+  const transformedProductData: Record<string, string | number> = {}
+  if (!ecommerce) {
+    return null
+  } else {
+    ecommerce.products?.forEach((product, index) =>
+      [
+        'product_id',
+        'sku',
+        'category',
+        'name',
+        'brand',
+        'variant',
+        'price',
+      ].forEach(prop => {
+        const key = `product_${prop}[${index}]`
+        transformedProductData[key] =
+          product[prop as keyof Product] || product.sku
+      })
+    )
+  }
+
+  const ecommerceData = {
+    order_id: ecommerce.order_id,
+    currency: ecommerce.currency,
+    value: ecommerce.revenue || ecommerce.total || ecommerce.value,
+    order_quantity: ecommerce.quantity,
+    ...transformedProductData,
+  }
+  return ecommerceData
+}
+
 export const getRequestBody = (
   eventType: string,
   event: MCEvent,
@@ -44,8 +120,7 @@ export const getRequestBody = (
     event: eventType,
   }
 
-  const { 'pd[em]': pdem, tid, ...cleanPayload } = payload
-
+  const { pdem, tid, ecommerce, ...cleanPayload } = payload
   // pd - partner data
   if (pdem) {
     requestBody['pd[em]'] = pdem
@@ -53,11 +128,17 @@ export const getRequestBody = (
 
   requestBody['pd[tm]'] = payload.tm || 'pinterest-mc'
 
-  if (Object.keys(cleanPayload).length) {
-    // event data
-    requestBody['ed'] = JSON.stringify(cleanPayload)
+  // match  event types to Pinterest's default
+
+  const ecommerceData = mapEcommerceData(ecommerce)
+  for (const key in ecommerceData) {
+    cleanPayload[key] = ecommerceData[key]
   }
 
+  if (Object.keys(cleanPayload).length) {
+    // event data is created, note that it also holds the ecommerce parameters
+    requestBody['ed'] = JSON.stringify(cleanPayload)
+  }
   return requestBody
 }
 
@@ -75,54 +156,41 @@ export const sendRequest = (url: string, event: MCEvent) => {
 }
 
 export const handler = (
-  eventType: string,
   event: MCEvent,
   settings: ComponentSettings,
+  ev: string,
   customSendRequest = sendRequest
 ) => {
+  const eventType = event.payload.ude || ev // ude is the "user defined event" field in case of eventType ='user-defined-event'
   const requestBody = getRequestBody(eventType, event, settings)
   const requestUrl = getRequestUrl(requestBody)
   customSendRequest(requestUrl, event)
 }
 
 export default async function (manager: Manager, settings: ComponentSettings) {
-  manager.addEventListener('pageview', event => {
-    handler('pagevisit', event, settings)
+  const events = [
+    'pageview',
+    'lead',
+    'signup',
+    'watchvideo',
+    'viewcategory',
+    'custom',
+    'addtocart',
+    'checkout',
+    'search',
+    'user-defined-event',
+  ]
+  events.forEach(ev => {
+    manager.addEventListener(ev, event => {
+      handler(event, settings, ev)
+    })
   })
-
-  manager.addEventListener('addtocart', event => {
-    handler('addtocart', event, settings)
-  })
-
-  manager.addEventListener('checkout', event => {
-    handler('checkout', event, settings)
-  })
-
-  manager.addEventListener('lead', event => {
-    handler('lead', event, settings)
-  })
-
-  manager.addEventListener('signup', event => {
-    handler('signup', event, settings)
-  })
-
-  manager.addEventListener('viewcategory', event => {
-    handler('viewcategory', event, settings)
-  })
-  manager.addEventListener('watchvideo', event => {
-    handler('watchVideo', event, settings)
-  })
-
-  manager.addEventListener('custom', event => {
-    handler('custom', event, settings)
-  })
-
-  manager.addEventListener('search', event => {
-    handler('search', event, settings)
-  })
-
-  manager.addEventListener('userdefinedevent', event => {
-    const userDefinedEvent: string = event.payload.userDefinedEvent
-    handler(userDefinedEvent, event, settings)
+  manager.addEventListener('ecommerce', event => {
+    if (typeof event.name === 'string') {
+      const ev = mapEcommerceEvent(event.name)
+      if (ev) {
+        handler(event, settings, ev)
+      }
+    }
   })
 }
